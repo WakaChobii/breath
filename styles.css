@@ -1,0 +1,100 @@
+:root {
+  --bg: #0B0D10;
+  --fill: 0;   /* 0..1  bar height fraction, set from JS */
+  --glow: 0;   /* 0..1  glow intensity, set from JS      */
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  height: 100dvh;
+  width: 100%;
+  background: var(--bg);
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+}
+
+.stage {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(24px, 5vh, 44px);
+  padding:
+    calc(env(safe-area-inset-top) + 16px)
+    env(safe-area-inset-right)
+    calc(env(safe-area-inset-bottom) + 16px)
+    env(safe-area-inset-left);
+  cursor: pointer;
+}
+
+.track {
+  position: relative;
+  width: 64px;
+  height: 55vh;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--fill) * 100%);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #7FA8D4 0%, #5E86B8 100%);
+  box-shadow:
+    0 0 calc(18px + 46px * var(--glow)) calc(2px + 8px * var(--glow)) rgba(127, 168, 212, calc(0.15 + 0.5 * var(--glow)));
+  will-change: height, box-shadow;
+}
+
+.phase {
+  position: relative;
+  height: 1.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.phase-word {
+  position: absolute;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  opacity: 0;
+  transition: opacity 700ms ease;
+  /* nudge left to visually center the letter-spaced text */
+  padding-left: 0.32em;
+}
+
+.phase-word.is-visible {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill {
+    /* freeze glow to a constant, subtle value; bar movement stays */
+    box-shadow: 0 0 22px 3px rgba(127, 168, 212, 0.22);
+  }
+}
