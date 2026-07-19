@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Breathe</title>
+
+  <meta name="theme-color" content="#0B0D10" />
+  <meta name="color-scheme" content="dark" />
+
+  <!-- Apple PWA -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Breathe" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="stage" aria-hidden="true">
+    <div class="track">
+      <div class="fill"></div>
+    </div>
+    <div class="phase">
+      <span class="phase-word phase-inhale is-visible">Inhale</span>
+      <span class="phase-word phase-exhale">Exhale</span>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').catch(function () {});
+      });
+    }
+  </script>
+</body>
+</html>
