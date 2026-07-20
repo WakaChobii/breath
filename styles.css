@@ -2,6 +2,7 @@
   --bg: #0B0D10;
   --fill: 0;   /* 0..1  bar height fraction, set from JS */
   --glow: 0;   /* 0..1  glow intensity, set from JS      */
+  --depth: 0;  /* 0..1  descent level, set from JS: deeper = cooler + slightly brighter */
 }
 
 * {
@@ -61,9 +62,15 @@ body {
   bottom: 0;
   height: calc(var(--fill) * 100%);
   border-radius: 999px;
-  background: linear-gradient(180deg, #7FA8D4 0%, #5E86B8 100%);
+  /* gradient cools toward indigo as the app guides you deeper (--depth 0 -> 1) */
+  background: linear-gradient(
+    180deg,
+    rgb(calc(127 - 17 * var(--depth)) calc(168 - 40 * var(--depth)) calc(212 + 18 * var(--depth))) 0%,
+    rgb(calc(94 - 4 * var(--depth)) calc(134 - 30 * var(--depth)) calc(184 + 30 * var(--depth))) 100%
+  );
   box-shadow:
-    0 0 calc(18px + 46px * var(--glow)) calc(2px + 8px * var(--glow)) rgba(127, 168, 212, calc(0.15 + 0.5 * var(--glow)));
+    0 0 calc(18px + 46px * var(--glow) + 10px * var(--depth)) calc(2px + 8px * var(--glow))
+    rgba(127, 168, 212, calc(0.15 + 0.5 * var(--glow) + 0.1 * var(--depth)));
   will-change: height, box-shadow;
 }
 
@@ -94,7 +101,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .fill {
-    /* freeze glow to a constant, subtle value; bar movement stays */
-    box-shadow: 0 0 22px 3px rgba(127, 168, 212, 0.22);
+    /* freeze glow to a constant, subtle value; bar movement + descent stay */
+    box-shadow: 0 0 calc(22px + 8px * var(--depth)) 3px rgba(127, 168, 212, 0.22);
   }
 }
