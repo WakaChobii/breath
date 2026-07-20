@@ -1,4 +1,7 @@
-var CACHE = 'breathe-v1';
+// Bump CACHE whenever you want to force a clean re-prime of the offline cache.
+// (Not strictly required for content updates anymore — see the fetch handler's
+// stale-while-revalidate below — but it guarantees a one-time reset on deploy.)
+var CACHE = 'breathe-v2';
 var ASSETS = [
   './',
   'index.html',
@@ -32,18 +35,27 @@ self.addEventListener('activate', function (event) {
   );
 });
 
+// Stale-while-revalidate: serve the cached copy instantly (fast + offline),
+// but always fetch a fresh copy in the background and update the cache. The
+// next time the app opens it shows the updated files — so future deploys land
+// on their own, no reinstall and no version bump required.
 self.addEventListener('fetch', function (event) {
   if (event.request.method !== 'GET') return;
   event.respondWith(
-    caches.match(event.request).then(function (cached) {
-      if (cached) return cached;
-      return fetch(event.request).then(function (response) {
-        return response;
-      }).catch(function () {
-        // offline and not cached; fall back to the app shell for navigations
-        if (event.request.mode === 'navigate') {
-          return caches.match('index.html');
-        }
+    caches.open(CACHE).then(function (cache) {
+      return cache.match(event.request).then(function (cached) {
+        var network = fetch(event.request).then(function (response) {
+          if (response && response.status === 200 && response.type === 'basic') {
+            cache.put(event.request, response.clone());
+          }
+          return response;
+        }).catch(function () {
+          // offline and uncached: fall back to the app shell for navigations
+          if (event.request.mode === 'navigate') {
+            return cache.match('index.html');
+          }
+        });
+        return cached || network;
       });
     })
   );
