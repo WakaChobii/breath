@@ -1,7 +1,7 @@
 // Bump CACHE whenever you want to force a clean re-prime of the offline cache.
 // (Not strictly required for content updates anymore — see the fetch handler's
 // stale-while-revalidate below — but it guarantees a one-time reset on deploy.)
-var CACHE = 'breathe-v2';
+var CACHE = 'breathe-v3';
 var ASSETS = [
   './',
   'index.html',
@@ -11,11 +11,22 @@ var ASSETS = [
   'icon-192.png',
   'icon-512.png'
 ];
+// Voice cues are generated separately (tools/generate-voice.mjs) and may not
+// exist yet, so they're precached best-effort — a missing file must not fail
+// the whole install. Once present they're served offline like everything else.
+var OPTIONAL_ASSETS = [
+  'audio/inhale.mp3',
+  'audio/exhale.mp3'
+];
 
 self.addEventListener('install', function (event) {
   event.waitUntil(
     caches.open(CACHE).then(function (cache) {
-      return cache.addAll(ASSETS);
+      return cache.addAll(ASSETS).then(function () {
+        return Promise.allSettled(OPTIONAL_ASSETS.map(function (a) {
+          return cache.add(a);
+        }));
+      });
     }).then(function () {
       return self.skipWaiting();
     })

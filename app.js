@@ -26,8 +26,53 @@
   var root = document.documentElement;
   var wordInhale = document.querySelector('.phase-inhale');
   var wordExhale = document.querySelector('.phase-exhale');
+  var voiceToggle = document.querySelector('.voice-toggle');
 
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // --- spoken cues -------------------------------------------------------
+  // Static, pre-generated audio (see tools/generate-voice.mjs). No API key or
+  // network call lives in the client — we just play files that ship with the
+  // app. Everything here fails silently: if the files aren't present yet, or
+  // the browser blocks autoplay, the visual pacer is unaffected.
+  var VOICE_KEY = 'breathe.voice';
+  var voiceOn = false;
+  try {
+    voiceOn = localStorage.getItem(VOICE_KEY) !== 'off';
+  } catch (e) {}
+
+  var cues = {};
+  function loadCue(name, src) {
+    var a = new Audio(src);
+    a.preload = 'auto';
+    cues[name] = a;
+  }
+  loadCue('inhale', 'audio/inhale.mp3');
+  loadCue('exhale', 'audio/exhale.mp3');
+
+  function playCue(name) {
+    if (!voiceOn) return;
+    var a = cues[name];
+    if (!a) return;
+    try {
+      a.currentTime = 0;
+      var p = a.play();
+      if (p && p.catch) p.catch(function () {});
+    } catch (e) {}
+  }
+
+  function renderVoiceToggle() {
+    if (!voiceToggle) return;
+    voiceToggle.textContent = voiceOn ? '🔊' : '🔇'; // 🔊 / 🔇
+    voiceToggle.setAttribute('aria-pressed', voiceOn ? 'true' : 'false');
+  }
+
+  function setVoice(on) {
+    voiceOn = on;
+    try { localStorage.setItem(VOICE_KEY, on ? 'on' : 'off'); } catch (e) {}
+    renderVoiceToggle();
+  }
+  renderVoiceToggle();
 
   // breath model
   var level = 0;
@@ -79,6 +124,7 @@
       wordExhale.classList.add('is-visible');
       wordInhale.classList.remove('is-visible');
     }
+    playCue(name);
   }
 
   function applyLevel(idx) {
@@ -258,4 +304,20 @@
     // finger slid off / interrupted — abandon the gesture without scoring
     gestureActive = false;
   });
+
+  // The voice toggle lives above the full-screen pacer surface. Stop its
+  // pointer events from bubbling to the document handlers so tapping it only
+  // flips the mute state — it never starts, pauses, or scores a breath.
+  if (voiceToggle) {
+    voiceToggle.addEventListener('pointerdown', function (e) {
+      e.stopPropagation();
+    });
+    voiceToggle.addEventListener('pointerup', function (e) {
+      e.stopPropagation();
+    });
+    voiceToggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setVoice(!voiceOn);
+    });
+  }
 })();

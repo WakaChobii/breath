@@ -1,0 +1,4 @@
+# Never commit secrets. The Speechify key belongs in your shell env only.
+.env
+.env.*
+*.key
