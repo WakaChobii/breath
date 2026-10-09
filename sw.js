@@ -1,12 +1,13 @@
 // Bump CACHE whenever you want to force a clean re-prime of the offline cache.
 // (Not strictly required for content updates anymore — see the fetch handler's
 // stale-while-revalidate below — but it guarantees a one-time reset on deploy.)
-var CACHE = 'breathe-v2';
+var CACHE = 'breathe-v3';
 var ASSETS = [
   './',
   'index.html',
   'styles.css',
   'app.js',
+  'sound.js',
   'manifest.json',
   'icon-192.png',
   'icon-512.png'

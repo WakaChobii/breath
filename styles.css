@@ -99,6 +99,52 @@ body {
   opacity: 1;
 }
 
+/* bottom controls: quiet, out of the way.
+   timer: tap for a 5 minute session. sound: tap to cycle Ocean -> Crystal -> Silent */
+.controls {
+  position: fixed;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom) + 20px);
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+}
+
+.pill {
+  min-width: 96px;
+  padding: 10px 16px 10px calc(16px + 0.24em);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  background: none;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: color 300ms ease, border-color 300ms ease;
+}
+
+.pill:focus-visible {
+  outline: 1px solid rgba(127, 168, 212, 0.6);
+  outline-offset: 3px;
+}
+
+@media (hover: hover) {
+  .pill:hover {
+    color: rgba(255, 255, 255, 0.55);
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+}
+
+/* a running timer reads a touch brighter so the countdown is findable */
+.timer-toggle.is-on {
+  color: rgba(255, 255, 255, 0.5);
+  border-color: rgba(127, 168, 212, 0.25);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fill {
     /* freeze glow to a constant, subtle value; bar movement + descent stay */
